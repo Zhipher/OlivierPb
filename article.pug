@@ -1,0 +1,51 @@
+extends ../commun/layout-front 
+
+block contenu_page 
+    h1 #{article.titre}
+    h1 #{article.contenu}
+    hr.my-3
+    // class m
+    //       m-0 ... 5 marge en haut en bas gauche et droite
+    //      mt-0 ... 5 marge top
+    //      mb-0 ... 5 marge bottom
+    //      ms-0 ... 5 marge left
+    //      me-0 ... 5 marge right
+    //      mx-0 ... 5 marge right + left
+    //      my-0 ... 5 marge top + botoom
+    h2 Laisser un commentaire
+    form 
+        input(type="email" class="form-control my-4" name="email" placeholder="votre@email.fr" )
+        textarea(placeholder="votre commentaire" name="commentaire" class="form-control")
+        - const prop = { type : "hidden", name : "id", value : article._id }
+        input&attributes(prop)
+        input(type="submit" class="btn btn-outline-dark btn-sm my-3") 
+    .message 
+    .liste-commentaire 
+        - if(article.commentaires.length > 0) {
+            each commentaire in articles.commentaires
+                div.border.border-primary.rounded.my-3.p-2
+                    p #{commentaire.email}
+                    p #{commentaire.commentaire}
+        - }
+
+block script_js 
+    //- script(src="/script.js")
+    script. 
+        document.querySelector('form').addEventListener('submit', (e) => {
+            e.preventDefault()
+
+            const commentaire = { 
+                email : e.target.email.value,
+                commentaire : e.target.commentaire.value, 
+                id_article : e.target.id.value,
+            }
+            console.log(commentaire)
+
+            const req = new XMLHttpRequest()
+            req.open('POST', 'http://localhost:5400/back/add_commentaire')
+            req.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
+            req.onload = () => {
+                console.log(req.responseText)
+            }
+            req.send(JSON.stringify(commentaire))
+        })
